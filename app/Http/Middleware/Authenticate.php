@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Helper\JsendHelper;
 use Closure;
 use Illuminate\Contracts\Auth\Factory as Auth;
 
@@ -35,8 +36,10 @@ class Authenticate
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if ($this->auth->guard($guard)->guest()) {
-            return response('Unauthorized.', 401);
+        $jsend = new JsendHelper();
+        if ($this->auth->guard($guard)->guest() || empty($request->bearerToken())) {
+            
+            return $jsend->jsend_error('Unauthorized', null, null, 401);
         }
 
         return $next($request);
